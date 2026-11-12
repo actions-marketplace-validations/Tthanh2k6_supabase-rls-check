@@ -24,6 +24,28 @@ MCP_TOOL_NAMES: tuple[str, str, str, str] = (
     'scan_public_env',
     'diff_results',
 )
+MCP_TOOL_TITLES: dict[str, str] = {
+    'analyze_sql_export': 'Analyze SQL export',
+    'explain_rule': 'Explain rule',
+    'scan_public_env': 'Scan public env',
+    'diff_results': 'Diff results',
+}
+
+
+def _tool_annotations(title: str) -> Any:
+    """All four tools only read local input: read-only, non-destructive, idempotent, closed-world."""
+    hints = dict(
+        title=title,
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    )
+    try:
+        from mcp.types import ToolAnnotations
+    except ImportError:  # SDK not installed (e.g. a test double server): pass plain hints
+        return hints
+    return ToolAnnotations(**hints)
 
 
 def analyze_sql_export(path: str) -> dict[str, Any]:
@@ -182,10 +204,9 @@ def create_mcp_server(fastmcp_cls: Any = None) -> Any:
             except ImportError as exc:
                 raise RuntimeError(MCP_INSTALL_HINT) from exc
     server = fastmcp_cls('supabase-rls-check')
-    server.tool()(analyze_sql_export)
-    server.tool()(explain_rule)
-    server.tool()(scan_public_env)
-    server.tool()(diff_results)
+    for fn in (analyze_sql_export, explain_rule, scan_public_env, diff_results):
+        title = MCP_TOOL_TITLES[fn.__name__]
+        server.tool(title=title, annotations=_tool_annotations(title))(fn)
     return server
 
 
