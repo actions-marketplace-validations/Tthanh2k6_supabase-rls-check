@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-11-13
+
 ### Changed
-- All four MCP tools now declare `readOnlyHint=true`, `destructiveHint=false`, `idempotentHint=true`, and `openWorldHint=false` (plus a human `title`), as required by MCP directories that reject tools missing a hint. A test asserts the four boolean hints on every tool.
+- MCP tools are registered with `add_tool()` instead of `tool()(fn)`, so static scanners and MCP catalogues (for example MCP Trust Checker on mcprush) can list all four tools; titles, annotations and behaviour are unchanged.
+
+## [0.6.2] - 2026-11-13
+
+### Changed
+- All four MCP tools now declare `readOnlyHint=true`, `destructiveHint=false`, `idempotentHint=true`, and `openWorldHint=false` (plus a human `title`), as required by MCP directories that reject tools missing a hint; the optional `mcp` extra now requires `mcp>=1.10`. A test asserts the four boolean hints on every tool.
 
 ## [0.6.1] - 2026-11-12
 
